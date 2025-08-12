@@ -41,32 +41,54 @@ export const SmartRedirect = () => {
   }, []);
 
   const handleOpenInChrome = () => {
-    const currentUrl = window.location.href;
+    const currentUrl = window.location.href.replace(/[?&]__lovable_token=[^&]*/, '');
     
-    // Try to detect if the app is already installed
-    if ('serviceWorker' in navigator) {
-      // Check if running as PWA
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        // Already in PWA mode
-        setShowRedirect(false);
-        return;
-      }
+    // Check if running as PWA
+    if ('serviceWorker' in navigator && window.matchMedia('(display-mode: standalone)').matches) {
+      setShowRedirect(false);
+      return;
     }
 
-    // Create intent URLs for different browsers
-    const chromeIntent = `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`;
-    const universalIntent = `intent://navigate?url=${encodeURIComponent(currentUrl)}#Intent;scheme=https;package=com.android.chrome;end`;
-    
-    try {
-      // Try Chrome intent first
-      window.location.href = chromeIntent;
+    // For Android devices
+    if (/android/i.test(navigator.userAgent)) {
+      // Try Google Chrome intent
+      const chromeIntent = `intent://${window.location.host}${window.location.pathname}${window.location.search}#Intent;scheme=https;package=com.android.chrome;end`;
       
-      // Fallback to opening in same window after a short delay
-      setTimeout(() => {
+      try {
+        window.location.href = chromeIntent;
+        
+        // Fallback after 2 seconds if Chrome intent fails
+        setTimeout(() => {
+          // Try opening in default browser
+          const newWindow = window.open(currentUrl, '_blank');
+          if (!newWindow) {
+            // If popup blocked, try location assignment
+            window.location.assign(currentUrl);
+          }
+        }, 2000);
+      } catch (error) {
+        // Direct fallback
+        window.open(currentUrl, '_system');
+      }
+    } 
+    // For iOS devices  
+    else if (/iphone|ipad/i.test(navigator.userAgent)) {
+      // iOS Chrome scheme
+      const chromeUrl = currentUrl.replace(/^https?:\/\//, 'googlechromes://');
+      
+      try {
+        window.location.href = chromeUrl;
+        
+        // Fallback to Safari after delay
+        setTimeout(() => {
+          window.open(currentUrl, '_blank');
+        }, 1500);
+      } catch (error) {
         window.open(currentUrl, '_blank');
-      }, 1000);
-    } catch (error) {
-      // Fallback to direct navigation
+      }
+    }
+    // For desktop or other platforms
+    else {
       window.open(currentUrl, '_blank');
     }
     
