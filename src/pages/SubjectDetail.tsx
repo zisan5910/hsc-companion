@@ -34,7 +34,7 @@ export const SubjectDetail = () => {
     {
       id: 'markedBooks',
       icon: Bookmark,
-      title: 'দাগানো বই',
+      title: 'বই',
       description: 'প্রস্তাবিত পাঠ্যবই ও গাইড',
       color: 'bg-green-50 border-green-200',
     },
