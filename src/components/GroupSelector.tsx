@@ -7,9 +7,9 @@ interface GroupSelectorProps {
 
 export const GroupSelector = ({ activeGroup, onGroupChange }: GroupSelectorProps) => {
   const groups = [
-    { id: "science", label: "বিজ্ঞান" },
-    { id: "humanities", label: "মানবিক" },
-    { id: "commerce", label: "বাণিজ্য" },
+    { id: "science", label: "বিজ্ঞান", emoji: "🔬" },
+    { id: "humanities", label: "মানবিক", emoji: "📚" },
+    { id: "commerce", label: "বাণিজ্য", emoji: "💼" },
   ];
 
   return (
